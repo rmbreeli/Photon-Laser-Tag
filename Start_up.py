@@ -12,3 +12,5 @@ lab.pack()                              # pack the label
 splash.mainloop()
 
 print("Hello")
+
+print("testing saving from vscode")
