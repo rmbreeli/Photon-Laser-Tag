@@ -1,4 +1,8 @@
 from supabase_py import create_client, Client
+##################################
+# INSTALL SUPABASE: pip install supabase-py
+##################################
+
 # xZmV05zR7JaK9N8u DO NOT DELETE
 
 #URL & Key to connect with Supabase
