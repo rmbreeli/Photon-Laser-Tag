@@ -1,13 +1,23 @@
 # Import Module
 from tkinter import *
+from PIL import Image, ImageTk
 
 splash = Tk()
-splash.title("Welcome")                 # assigning title for splash screen
-splash.geometry("500x300+50+50")      # set geometry for splash screen
-splash.after(10000, splash.destroy)      # splash screen will destroy after 4 sec 
-bg = PhotoImage(file = "splash_image.png") # insert file name to be display
-lab = Label(splash, image = bg)         # create label
-lab.pack()                              # pack the label
+splash.title("Splash image")        
+
+width = splash.winfo_screenwidth()
+height = splash.winfo_screenheight()
+
+splash.geometry('{}x{}+{}+{}'.format(width*1, height*1, 0, 0))      
+
+#how long the image stays
+splash.after(10000, splash.destroy)  
+#reads in the png
+picture = PhotoImage(file = "splash_image.png") 
+# creates label
+lab = Label(splash, image = picture)    
+# packs label
+lab.pack()     
 
 splash.mainloop()
 
