@@ -11,7 +11,7 @@ height = splash.winfo_screenheight()
 splash.geometry('{}x{}+{}+{}'.format(width*1, height*1, 0, 0))      
 
 #how long the image stays
-splash.after(10000, splash.destroy)  
+splash.after(4000, splash.destroy)  
 #reads in the png
 picture = PhotoImage(file = "splash_image1.png") 
 # creates label
@@ -23,4 +23,3 @@ splash.mainloop()
 
 print("Hello")
 
-print("testing saving from vscode12345")
