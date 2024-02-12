@@ -16,7 +16,8 @@ response = supabase.table('Users').select("*").execute()
 print(response)
 
 #Adding data to database
-supabase.table("Users").insert({"Name": "Gashler"}).execute()
+user_name = input("Enter your name: ")
+supabase.table("Users").insert({"Name": "im_sorry_im_testing"}).execute()
 response = supabase.table('Users').select("*").execute()
 print(response)
 
