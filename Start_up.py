@@ -38,8 +38,15 @@ response = supabase.table('Users').select("*").execute()
 print(response)
 
 #Adding data to database
-user_name = input("Enter your name: ")
-supabase.table("Users").insert({"Name": user_name}).execute()
+while True:
+    user_name = input("Enter your name(or 0 to finish player entry)>> ")
+    if user_name =='0':
+        break
+    else:
+        supabase.table("Users").insert({"Name": user_name}).execute()
+
+
+
 response = supabase.table('Users').select("*").execute()
 print(response)
 
