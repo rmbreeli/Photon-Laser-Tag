@@ -15,28 +15,13 @@ supabase: Client = create_client(url, key)
 response = supabase.table('Users').select("*").execute()
 print(response)
 
-response = {'data': [{'id': 2, 'Name': 'OPUS'}, {'id': 10, 'Name': 'Reese'}, {'id': 11, 'Name': 'Josh'}, {'id': 25, 'Name': 'Javi'}, {'id': 26, 'Name': 'Josh(again)'}, {'id': 28, 'Name': 'im_sorry_im_testing'}, {'id': 29, 'Name': 'test'}], 'status_code': 200}
 
-target_id = 11  # replace with the ID you want to compare
-target_name = 'TEST'  # replace with the Name you want to compare
-
-for entry in response['data']:
-    if entry['id'] == target_id:
-        print(f"Match found for ID: {target_id} and Name: {target_name}")
-        # Update the fields in the data
-        target_id= entry['id']
-        target_name = entry['Name']
-        print("{} and {}".format(target_id, target_name))
-        break
-else:
-    print(f"No match found for ID: {target_id} and Name: {target_name}")
-
-print("Updated data:", response['data'])
 
 
 #Adding data to database
 #user_name = input("Enter your name: ")
-#supabase.table("Users").insert({"Name": user_name}).execute()
+data_to_insert = {"id": '444', "Name": 'TWST444'}
+supabase.table("Users").insert(data_to_insert).execute()
 print(response)
 
 

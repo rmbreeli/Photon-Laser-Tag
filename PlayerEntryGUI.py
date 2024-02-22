@@ -160,11 +160,12 @@ def add_player_entry():
     supabase_data = supabase.table('Users').select("*").execute()
     print(supabase_data)
     for entry in supabase_data['data']:
-        print(entry['id'])
-        print(player_id)
         if (str)(entry['id']) == player_id:
             player_id = entry['id']
             player_name = entry['Name']
+        else:
+            data_to_insert = {"id": player_id, "Name": player_name}
+            supabase.table("Users").insert(data_to_insert).execute()
 
 
     if team_color == "Red":
