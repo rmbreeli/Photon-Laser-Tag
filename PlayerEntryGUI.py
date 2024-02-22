@@ -153,17 +153,21 @@ def add_player_entry():
     player_name = player_name_entry.get()
     team_color = team_color_var.get()
     player_id = player_id_entry.get()
+    not_in_database = 0
 
     if not player_name or not player_id:
         messagebox.showerror("Error", "Please enter both a player name and an ID.")
         return
     supabase_data = supabase.table('Users').select("*").execute()
-    print(supabase_data)
     for entry in supabase_data['data']:
         if (str)(entry['id']) == player_id:
             player_id = entry['id']
             player_name = entry['Name']
-        else:
+            not_in_database = 1
+
+            
+        if(not_in_database == 1):
+            int_player_id = player_id
             data_to_insert = {"id": player_id, "Name": player_name}
             supabase.table("Users").insert(data_to_insert).execute()
 

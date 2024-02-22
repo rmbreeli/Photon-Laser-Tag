@@ -20,8 +20,8 @@ print(response)
 
 #Adding data to database
 #user_name = input("Enter your name: ")
-data_to_insert = {"id": '444', "Name": 'TWST444'}
-supabase.table("Users").insert(data_to_insert).execute()
+#data_to_insert = {"id": '444', "Name": 'TWST444'}
+#supabase.table("Users").insert(data_to_insert).execute()
 print(response)
 
 
