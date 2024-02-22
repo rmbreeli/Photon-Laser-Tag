@@ -5,6 +5,7 @@ from supabase_py import create_client, Client
 import time
 
 splash = Tk()
+splash.attributes('-fullscreen', True)  # Set fullscreen
 splash.title("Splash image")        
 
 width = splash.winfo_screenwidth()
