@@ -99,11 +99,14 @@ for i in range(20):
     player_id_entry = tk.Entry(red_frame, bg="light gray", width=18)
     player_id_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky="nsew")
 
-    equipment_id_entry = tk.Entry(red_frame, bg="light gray", width=30)
-    equipment_id_entry.grid(row=i+1, column=2, padx=5, pady=5, sticky="nsew")
+    id_entry = tk.Entry(red_frame, bg="light gray", width=20)
+    id_entry.grid(row=i+1, column=2, padx=5, pady=5, sticky="nsew")
+
+    equipment_id_entry = tk.Entry(red_frame, bg ="light gray", width = 10)
+    equipment_id_entry.grid(row=i+1, column=3, padx=5, pady=5, sticky="nsew")
 
     red_player_entries.append(player_id_entry)
-    red_ID_entries.append(equipment_id_entry)
+    red_ID_entries.append(id_entry)
 
 # Grid layout for the green frame
 greenTitle = tk.Label(green_frame, text="GREEN TEAM", fg="light gray", relief=tk.SOLID, bg="dark green", highlightthickness=2)
@@ -126,12 +129,15 @@ for i in range(20):
     player_id_entry = tk.Entry(green_frame, bg="light gray", width=18)
     player_id_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky="nsew")
     
+    id_entry = tk.Entry(green_frame, bg="light gray", width=20)
+    id_entry.grid(row=i+1, column=2, padx=5, pady=5, sticky="nsew")
 
-    equipment_id_entry = tk.Entry(green_frame, bg="light gray", width=30)
-    equipment_id_entry.grid(row=i+1, column=2, padx=5, pady=5, sticky="nsew")
+    equipment_id_entry = tk.Entry(green_frame, bg ="light gray", width = 10)
+    equipment_id_entry.grid(row=i+1, column=3, padx=5, pady=5, sticky="nsew")
+    
 
     green_player_entries.append(player_id_entry)
-    green_ID_entries.append(green_ID_entries)
+    green_ID_entries.append(id_entry)
 
 # Grid layout for the lower section
 def create_frames(frame, num_frames):
@@ -153,17 +159,20 @@ def add_player_entry():
     player_name = player_name_entry.get()
     team_color = team_color_var.get()
     player_id = player_id_entry.get()
-    not_in_database = 0
+    equipment_id = equipment_id_entry.get()  # New line to get equipment ID
+    not_in_database = 1
 
-    if not player_name or not player_id:
-        messagebox.showerror("Error", "Please enter both a player name and an ID.")
+    if not player_name or not player_id or not equipment_id:  # Check for equipment ID
+        messagebox.showerror("Error", "Please enter player name, ID, and equipment ID.")
         return
+    
     supabase_data = supabase.table('Users').select("*").execute()
+    
     for entry in supabase_data['data']:
         if (str)(entry['id']) == player_id:
             player_id = entry['id']
             player_name = entry['Name']
-            not_in_database = 1
+            not_in_database = 0
 
             
         if(not_in_database == 1):
@@ -181,17 +190,24 @@ def add_player_entry():
 
     for i, entry in enumerate(player_entries, start=1):
         if not entry.get():
+            #insert player name
             entry.insert(0, player_name)
-            
-            # Using the entered ID
-            equipment_id_entry = tk.Entry(color_frame, bg="light gray", width=30)
-            equipment_id_entry.grid(row=i, column=2, padx=5, pady=5, sticky="nsew")
-            equipment_id_entry.insert(0, str(player_id).zfill(2))
-            
+
+            # Insert player ID
+            id_entries = color_frame.grid_slaves(row=i, column=2)
+            if id_entries:
+                id_entries[0].insert(0, player_id)
+
+            # Insert equipment ID
+            equipment_id_entries = color_frame.grid_slaves(row=i, column=3)
+            if equipment_id_entries:
+                equipment_id_entries[0].insert(0, equipment_id)
+
             break
 
     player_name_entry.delete(0, tk.END)
     player_id_entry.delete(0, tk.END)
+    equipment_id_entry.delete(0, tk.END)
 
 root = tk.Tk()
 root.title("Laser Tag Player Entries")
@@ -220,10 +236,15 @@ tk.Label(player_entry_frame, text="Player ID:", fg="white", bg="black").grid(row
 player_id_entry = tk.Entry(player_entry_frame, bg="light gray", width=18)
 player_id_entry.grid(row=1, column=1, padx=5, pady=5)
 
-tk.Label(player_entry_frame, text="Team Color:", fg="white", bg="black").grid(row=2, column=0, padx=5, pady=5)
+# Inside the GUI layout section
+tk.Label(player_entry_frame, text="Equipment ID:", fg="white", bg="black").grid(row=2, column=0, padx=5, pady=5)
+equipment_id_entry = tk.Entry(player_entry_frame, bg="light gray", width=18)
+equipment_id_entry.grid(row=2, column=1, padx=5, pady=5)
+
+tk.Label(player_entry_frame, text="Team Color:", fg="white", bg="black").grid(row=3, column=0, padx=5, pady=5)
 team_color_var = tk.StringVar(value="Red")
 team_color_entry = tk.OptionMenu(player_entry_frame, team_color_var, "Red", "Green")
-team_color_entry.grid(row=2, column=1, padx=5, pady=5)
+team_color_entry.grid(row=3, column=1, padx=5, pady=5)
 
 def on_team_color_change(*args):
     selected_team_label.config(text=f"Selected Team: {team_color_var.get()}")
@@ -231,10 +252,10 @@ def on_team_color_change(*args):
 team_color_var.trace_add("write", on_team_color_change)
 
 selected_team_label = tk.Label(player_entry_frame, text="Selected Team: Red", fg="white", bg="black")
-selected_team_label.grid(row=3, column=0, columnspan=2, pady=5)
+selected_team_label.grid(row=4, column=0, columnspan=2, pady=5)
 
 add_player_button = tk.Button(player_entry_frame, text="Add Player", command=add_player_entry)
-add_player_button.grid(row=4, column=0, columnspan=2, pady=5)
+add_player_button.grid(row=5, column=0, columnspan=2, pady=5)
 
 player_entry_frame.lift()
 root.attributes('-topmost', True)
