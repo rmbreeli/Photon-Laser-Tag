@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import time
+import socket
 from supabase_py import create_client, Client
 
 # xZmV05zR7JaK9N8u DO NOT DELETE
@@ -155,6 +156,26 @@ lower_frame.grid_rowconfigure(0, weight=1)
 root.grid_rowconfigure(0, weight=1)
 root.grid_columnconfigure(0, weight=1)
 
+def broadcast_udp_message(message, port):
+    # Create a UDP socket
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    
+    # Enable broadcasting
+    udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+    # Set the broadcast address and port
+    broadcast_address = ('<broadcast>', port)
+
+    try:
+        # Send the UDP packet
+        udp_socket.sendto(message.encode(), broadcast_address)
+        print(f"Broadcasted message '{message}' to port {port}")
+
+    finally:
+        # Close the socket
+        udp_socket.close()
+
+
 def add_player_entry():
     player_name = player_name_entry.get()
     team_color = team_color_var.get()
@@ -176,7 +197,6 @@ def add_player_entry():
 
             
         if(not_in_database == 1):
-            int_player_id = player_id
             data_to_insert = {"id": player_id, "Name": player_name}
             supabase.table("Users").insert(data_to_insert).execute()
 
@@ -202,6 +222,8 @@ def add_player_entry():
             equipment_id_entries = color_frame.grid_slaves(row=i, column=3)
             if equipment_id_entries:
                 equipment_id_entries[0].insert(0, equipment_id)
+
+            broadcast_udp_message(equipment_id, 7500)
 
             break
 
