@@ -97,13 +97,13 @@ for i in range(20):
     row_number_label = tk.Label(canvas, text=str(i), bg="red4", fg="light gray", width=1, height=1)
     row_number_label.place(relx=0.5, rely=0.5, anchor="center")
 
-    player_id_entry = tk.Entry(red_frame, bg="light gray", width=18)
+    player_id_entry = tk.Entry(red_frame, bg="light gray", fg = "black", width=18)
     player_id_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky="nsew")
 
-    id_entry = tk.Entry(red_frame, bg="light gray", width=20)
+    id_entry = tk.Entry(red_frame, bg="light gray", fg = "black", width=20)
     id_entry.grid(row=i+1, column=2, padx=5, pady=5, sticky="nsew")
 
-    equipment_id_entry = tk.Entry(red_frame, bg ="light gray", width = 10)
+    equipment_id_entry = tk.Entry(red_frame, bg ="light gray", fg = "black", width = 10)
     equipment_id_entry.grid(row=i+1, column=3, padx=5, pady=5, sticky="nsew")
 
     red_player_entries.append(player_id_entry)
@@ -127,13 +127,13 @@ for i in range(20):
     row_number_label = tk.Label(canvas, text=str(i), bg="dark green", fg="light gray", width=1, height=1)
     row_number_label.place(relx=0.5, rely=0.5, anchor="center")
 
-    player_id_entry = tk.Entry(green_frame, bg="light gray", width=18)
+    player_id_entry = tk.Entry(green_frame, bg="light gray",fg = "black", width=18)
     player_id_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky="nsew")
     
-    id_entry = tk.Entry(green_frame, bg="light gray", width=20)
+    id_entry = tk.Entry(green_frame, bg="light gray",fg = "black", width=20)
     id_entry.grid(row=i+1, column=2, padx=5, pady=5, sticky="nsew")
 
-    equipment_id_entry = tk.Entry(green_frame, bg ="light gray", width = 10)
+    equipment_id_entry = tk.Entry(green_frame, bg ="light gray",fg = "black", width = 10)
     equipment_id_entry.grid(row=i+1, column=3, padx=5, pady=5, sticky="nsew")
     
 
@@ -236,8 +236,8 @@ root.title("Laser Tag Player Entries")
 
 
 
-window_width = 240 # Set width of the window
-window_height = 200  # Set height of the window
+window_width = 330 # Set width of the window
+window_height = 250  # Set height of the window
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -251,16 +251,16 @@ player_entry_frame = tk.LabelFrame(root, text="Player Entry", bg="black", fg="wh
 player_entry_frame.grid(row=1, column=4, padx=10, pady=10, sticky="nsew")
 
 tk.Label(player_entry_frame, text="Player Name:", fg="white", bg="black").grid(row=0, column=0, padx=5, pady=5)
-player_name_entry = tk.Entry(player_entry_frame, bg="light gray", width=18)
+player_name_entry = tk.Entry(player_entry_frame, bg="light gray",fg = "black", width=18)
 player_name_entry.grid(row=0, column=1, padx=5, pady=5)
 
 tk.Label(player_entry_frame, text="Player ID:", fg="white", bg="black").grid(row=1, column=0, padx=5, pady=5)
-player_id_entry = tk.Entry(player_entry_frame, bg="light gray", width=18)
+player_id_entry = tk.Entry(player_entry_frame, bg="light gray", fg = "black", width=18)
 player_id_entry.grid(row=1, column=1, padx=5, pady=5)
 
 # Inside the GUI layout section
 tk.Label(player_entry_frame, text="Equipment ID:", fg="white", bg="black").grid(row=2, column=0, padx=5, pady=5)
-equipment_id_entry = tk.Entry(player_entry_frame, bg="light gray", width=18)
+equipment_id_entry = tk.Entry(player_entry_frame, bg="light gray",fg = "black", width=18)
 equipment_id_entry.grid(row=2, column=1, padx=5, pady=5)
 
 tk.Label(player_entry_frame, text="Team Color:", fg="white", bg="black").grid(row=3, column=0, padx=5, pady=5)
