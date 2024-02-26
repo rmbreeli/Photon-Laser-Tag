@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
-from PIL import Image, ImageTk
+from PIL import Image
 import time
 import socket
 from supabase_py import create_client, Client
@@ -19,6 +19,9 @@ red_player_entries = []
 green_player_entries = []
 red_ID_entries = []
 green_ID_entries =[]
+players_in_game_red = []
+players_in_game_green = []
+
 
 splash = Tk()
 splash.attributes('-fullscreen', True)  # Set fullscreen
@@ -187,30 +190,44 @@ def add_player_entry():
         messagebox.showerror("Error", "Please enter player name, ID, and equipment ID.")
         return
     
-    supabase_data = supabase.table('Users').select("*").execute()
+    for player in players_in_game_red:
+        name, id = player
+        if name == player_name or id == player_id:
+            messagebox.showerror("Error", "Please enter a different player name or ID.")
+            return
     
+    for player in players_in_game_green:
+        name, id = player
+        if name == player_name or id == player_id:
+            messagebox.showerror("Error", "Please enter a different player name or ID.")
+            return
+
+    supabase_data = supabase.table('Users').select("*").execute()
+
     for entry in supabase_data['data']:
-        if (str)(entry['id']) == player_id:
+        if str(entry['id']) == player_id:
             player_id = entry['id']
             player_name = entry['Name']
             not_in_database = 0
 
-            
-        if(not_in_database == 1):
-            data_to_insert = {"id": player_id, "Name": player_name}
-            supabase.table("Users").insert(data_to_insert).execute()
-
+    if not_in_database == 1:
+        data_to_insert = {"id": player_id, "Name": player_name}
+        supabase.table("Users").insert(data_to_insert).execute()
 
     if team_color == "Red":
         player_entries = red_player_entries
         color_frame = red_frame
+        players_in_game_red.append([player_name, player_id])
+        print(players_in_game_red)
     else:
         player_entries = green_player_entries
         color_frame = green_frame
+        players_in_game_green.append([player_name, player_id])
+        print(players_in_game_green)
 
     for i, entry in enumerate(player_entries, start=1):
         if not entry.get():
-            #insert player name
+            # insert player name
             entry.insert(0, player_name)
 
             # Insert player ID
@@ -237,7 +254,7 @@ root.title("Laser Tag Player Entries")
 
 
 window_width = 240 # Set width of the window
-window_height = 200  # Set height of the window
+window_height = 250  # Set height of the window
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
