@@ -191,15 +191,15 @@ def add_player_entry():
         return
     
     for player in players_in_game_red:
-        name, id = player
-        if name == player_name or id == player_id:
-            messagebox.showerror("Error", "Please enter a different player name or ID.")
+        name, id , equip_id= player
+        if name == player_name or id == player_id or equipment_id == equip_id:
+            messagebox.showerror("Error", "Please enter a different Player name, ID, or Equipment ID.")
             return
     
     for player in players_in_game_green:
         name, id = player
-        if name == player_name or id == player_id:
-            messagebox.showerror("Error", "Please enter a different player name or ID.")
+        if name == player_name or id == player_id or equipment_id == equip_id:
+            messagebox.showerror("Error", "Please enter a different Player name, ID, or Equipment ID.")
             return
 
     supabase_data = supabase.table('Users').select("*").execute()
@@ -217,12 +217,12 @@ def add_player_entry():
     if team_color == "Red":
         player_entries = red_player_entries
         color_frame = red_frame
-        players_in_game_red.append([player_name, player_id])
+        players_in_game_red.append([player_name, player_id, equipment_id])
         print(players_in_game_red)
     else:
         player_entries = green_player_entries
         color_frame = green_frame
-        players_in_game_green.append([player_name, player_id])
+        players_in_game_green.append([player_name, player_id, equipment_id])
         print(players_in_game_green)
 
     for i, entry in enumerate(player_entries, start=1):
