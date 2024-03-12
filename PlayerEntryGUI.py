@@ -28,7 +28,7 @@ players_in_game_green = []
 
 splash = Tk()
 splash.attributes('-fullscreen', True)  # Set fullscreen
-splash.title("Splash image")        
+splash.title("Splash image")
 
 width = splash.winfo_screenwidth()
 height = splash.winfo_screenheight()
@@ -349,6 +349,43 @@ class GameActionScreen(tk.Tk):
         self.create_team_slots(self.red_frame, "red", column=0, data=players_in_game_red)
         self.create_team_slots(self.green_frame, "green", column=1, data=players_in_game_green)
 
+        self.start_game_timer()
+
+        # Bind keys to increase scores
+        self.bind('<KeyPress-r>', self.increase_red_score)
+        self.bind('<KeyPress-g>', self.increase_green_score)
+
+
+    def start_game_timer(self):
+            self.remaining_time = 600  # 10 minutes in seconds
+
+            def update_timer():
+                if self.remaining_time > 0:
+                    minutes, seconds = divmod(self.remaining_time, 60)
+                    time_str = f"{minutes:02d}:{seconds:02d}"
+                    self.action_box.delete(1.0, tk.END)  # Clear previous time
+                    self.action_box.insert(tk.END, f"Time remaining: {time_str}\n")
+                    self.remaining_time -= 1
+                    self.after(1000, update_timer)
+                else:
+                    self.action_box.insert(tk.END, "Time's up!\n")
+            update_timer()
+
+
+    def increase_red_score(self, event):
+        current_score = int(self.red_score_var.get())
+        new_score = current_score + 100
+        self.red_score_var.set(new_score)
+        self.red_score_entry.delete(0, tk.END)
+        self.red_score_entry.insert(0, str(new_score))
+
+    def increase_green_score(self, event):
+        current_score = int(self.green_score_var.get())
+        new_score = current_score + 100
+        self.green_score_var.set(new_score)
+        self.green_score_entry.delete(0, tk.END)
+        self.green_score_entry.insert(0, str(new_score))
+
 
     def create_team_slots(self, frame, color, column, data):
         # Create and populate team slots
@@ -363,11 +400,27 @@ class GameActionScreen(tk.Tk):
             count += 1
 
 
+# def on_f5_press(event):
+#     if event.keysym == 'F5':
+#         print("f5 pressed")
+#         game_screen = GameActionScreen(players_in_game_red, players_in_game_green)
+#         game_screen.mainloop()
+
+game_screen = None
+
 def on_f5_press(event):
+    global game_screen
+    
     if event.keysym == 'F5':
-        print("f5 pressed")
-        game_screen = GameActionScreen(players_in_game_red, players_in_game_green)
-        game_screen.mainloop()
+        if game_screen is not None:
+            # Close the existing game screen
+            # print("f5 pressed")
+            game_screen.destroy()
+            game_screen = None
+        else:
+            # Open a new game screen
+            game_screen = GameActionScreen(players_in_game_red, players_in_game_green)
+            game_screen.mainloop()
 
 def clear_players(event):
     if event.keysym == 'F12':
