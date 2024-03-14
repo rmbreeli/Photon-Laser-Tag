@@ -15,15 +15,7 @@ key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdu
 supabase: Client = create_client(url, key)
 
 
-name_counter = 0
-red_player_entries = []
-green_player_entries = []
-red_ID_entries = []
-green_ID_entries =[]
-red_equipment_entries =[]
-green_equipment_entries =[]
-players_in_game_red = []
-players_in_game_green = []
+
 
 
 splash = Tk()
