@@ -186,7 +186,7 @@ def broadcast_udp_message(message, port):
 
 def add_player_entry():
     player_name = player_name_entry.get()
-    team_color = team_color_var.get()
+    #team_color = team_color_var.get()
     player_id = player_id_entry.get()
     equipment_id = equipment_id_entry.get()  # New line to get equipment ID
     not_in_database = 1
@@ -219,16 +219,17 @@ def add_player_entry():
         data_to_insert = {"id": player_id, "Name": player_name}
         supabase.table("Users").insert(data_to_insert).execute()
 
-    if team_color == "Red":
-        player_entries = red_player_entries
-        color_frame = red_frame
-        players_in_game_red.append([player_name, player_id, equipment_id])
-        print(players_in_game_red)
-    else:
+    #if equipment ID is even automatically puts player on the green team
+    if int(equipment_id) % 2 == 0:
         player_entries = green_player_entries
         color_frame = green_frame
         players_in_game_green.append([player_name, player_id, equipment_id])
         print(players_in_game_green)
+    else:
+        player_entries = red_player_entries
+        color_frame = red_frame
+        players_in_game_red.append([player_name, player_id, equipment_id])
+        print(players_in_game_red)
 
     for i, entry in enumerate(player_entries, start=1):
         if not entry.get():
@@ -259,7 +260,7 @@ root.title("Laser Tag Player Entries")
 
 
 window_width = 240 # Set width of the window
-window_height = 250  # Set height of the window
+window_height = 200  # Set height of the window
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -272,31 +273,18 @@ root.geometry(f"{window_width}x{window_height}+1025+0")
 player_entry_frame = tk.LabelFrame(root, text="Player Entry", bg="black", fg="white")
 player_entry_frame.grid(row=1, column=4, padx=10, pady=10, sticky="nsew")
 
-tk.Label(player_entry_frame, text="Player Name:", fg="white", bg="black").grid(row=0, column=0, padx=5, pady=5)
-player_name_entry = tk.Entry(player_entry_frame, bg="light gray",fg = "black", width=18)
-player_name_entry.grid(row=0, column=1, padx=5, pady=5)
+tk.Label(player_entry_frame, text="Player ID:", fg="white", bg="black").grid(row=0, column=0, padx=5, pady=5)
+player_id_entry = tk.Entry(player_entry_frame, bg="light gray", fg="black", width=18)
+player_id_entry.grid(row=0, column=1, padx=5, pady=5)
 
-tk.Label(player_entry_frame, text="Player ID:", fg="white", bg="black").grid(row=1, column=0, padx=5, pady=5)
-player_id_entry = tk.Entry(player_entry_frame, bg="light gray", fg = "black", width=18)
-player_id_entry.grid(row=1, column=1, padx=5, pady=5)
+tk.Label(player_entry_frame, text="Player Name:", fg="white", bg="black").grid(row=1, column=0, padx=5, pady=5)
+player_name_entry = tk.Entry(player_entry_frame, bg="light gray", fg="black", width=18)
+player_name_entry.grid(row=1, column=1, padx=5, pady=5)
 
 # Inside the GUI layout section
 tk.Label(player_entry_frame, text="Equipment ID:", fg="white", bg="black").grid(row=2, column=0, padx=5, pady=5)
 equipment_id_entry = tk.Entry(player_entry_frame, bg="light gray",fg = "black", width=18)
 equipment_id_entry.grid(row=2, column=1, padx=5, pady=5)
-
-tk.Label(player_entry_frame, text="Team Color:", fg="white", bg="black").grid(row=3, column=0, padx=5, pady=5)
-team_color_var = tk.StringVar(value="Red")
-team_color_entry = tk.OptionMenu(player_entry_frame, team_color_var, "Red", "Green")
-team_color_entry.grid(row=3, column=1, padx=5, pady=5)
-
-def on_team_color_change(*args):
-    selected_team_label.config(text=f"Selected Team: {team_color_var.get()}")
-
-team_color_var.trace_add("write", on_team_color_change)
-
-selected_team_label = tk.Label(player_entry_frame, text="Selected Team: Red", fg="white", bg="black")
-selected_team_label.grid(row=4, column=0, columnspan=2, pady=5)
 
 add_player_button = tk.Button(player_entry_frame, text="Add Player", command=add_player_entry)
 add_player_button.grid(row=5, column=0, columnspan=2, pady=5)
