@@ -1,4 +1,4 @@
-import Tkinter as tk
+import kinter as tk
 import keyboard
 
 x = True
