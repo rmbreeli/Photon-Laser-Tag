@@ -1,4 +1,4 @@
-import Tkinter as tk
+import tkinter as tk
 from Tkinter import *
 from Tkinter import messagebox
 from PIL import Image
