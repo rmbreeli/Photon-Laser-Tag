@@ -316,7 +316,6 @@ class GameActionScreen(tk.Tk):
         self.green_title = tk.Label(self.green_frame, text="Green Team", fg="green", bg="black", font=("Helvetica", 16, "bold"))
         self.green_title.grid(row=0, column=1, columnspan=2)
 
-
         # Create and configure action box
         self.action_box = tk.Text(self, height=10, width=40, bg="lightgray", fg="black", font=("Helvetica", 15))
         self.action_box.grid(row=0, column=2, padx=10, pady=10)
@@ -332,32 +331,34 @@ class GameActionScreen(tk.Tk):
         self.green_score_entry = tk.Entry(self, textvariable=self.green_score_var, fg="green", bg="black", font=("Helvetica", 14, "bold"), width=5)
         self.green_score_entry.grid(row=1, column=1, padx=10, pady=10)
 
+        # Create label for timer
+        self.timer_label = tk.Label(self, text="Time remaining:", fg="white", bg="black", font=("Helvetica", 14, "bold"))
+        self.timer_label.grid(row=1, column=2, padx=10, pady=10, sticky="e")
+
+        # Start the game timer
+        self.start_game_timer()
 
         #putting players into the action screen.
         self.create_team_slots(self.red_frame, "red", column=0, data=players_in_game_red)
         self.create_team_slots(self.green_frame, "green", column=1, data=players_in_game_green)
 
-        self.start_game_timer()
-
         # Bind keys to increase scores
         self.bind('<KeyPress-r>', self.increase_red_score)
         self.bind('<KeyPress-g>', self.increase_green_score)
 
-
     def start_game_timer(self):
-            self.remaining_time = 600  # 10 minutes in seconds
+        self.remaining_time = 600  # 10 minutes in seconds
 
-            def update_timer():
-                if self.remaining_time > 0:
-                    minutes, seconds = divmod(self.remaining_time, 60)
-                    time_str = f"{minutes:02d}:{seconds:02d}"
-                    self.action_box.delete(1.0, tk.END)  # Clear previous time
-                    self.action_box.insert(tk.END, f"Time remaining: {time_str}\n")
-                    self.remaining_time -= 1
-                    self.after(1000, update_timer)
-                else:
-                    self.action_box.insert(tk.END, "Time's up!\n")
-            update_timer()
+        def update_timer():
+            if self.remaining_time > 0:
+                minutes, seconds = divmod(self.remaining_time, 60)
+                time_str = f"{minutes:02d}:{seconds:02d}"
+                self.timer_label.config(text=f"Time remaining: {time_str}")  # Update timer label
+                self.remaining_time -= 1
+                self.after(1000, update_timer)
+            else:
+                self.action_box.insert(tk.END, "Time's up!\n")
+        update_timer()
 
 
     def increase_red_score(self, event):
