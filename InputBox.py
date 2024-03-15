@@ -34,6 +34,7 @@ def main():
     name_label = tk.Label(root, text="Enter your name:")
     name_label.pack()
 
+    #aidan made this comment
     name_entry = tk.Entry(root)
     name_entry.pack()
 
