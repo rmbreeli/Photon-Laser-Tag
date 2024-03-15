@@ -1,6 +1,6 @@
-import tkinter as tk
-from tkinter import *
-from tkinter import messagebox
+import Tkinter as tk
+from Tkinter import *
+from Tkinter import messagebox
 from PIL import Image
 import time
 import socket
