@@ -6,14 +6,6 @@ import time
 import socket
 from supabase_py import create_client, Client
 import keyboard
-import tkinter as tk
-from tkinter import *
-from tkinter import messagebox
-from PIL import Image
-import time
-import socket
-from supabase_py import create_client, Client
-import keyboard
 import pygame
 
 # xZmV05zR7JaK9N8u DO NOT DELETE
@@ -317,6 +309,7 @@ def stop_music():
     pygame.mixer.music.stop()
 
     
+
 class GameActionScreen(tk.Tk):
     def __init__(self, players_in_game_red, players_in_game_green):
         super().__init__()
@@ -374,8 +367,31 @@ class GameActionScreen(tk.Tk):
         self.bind('<KeyPress-r>', self.increase_red_score)
         self.bind('<KeyPress-g>', self.increase_green_score)
 
+        self.start_initial_countdown()
+
+    def start_initial_countdown(self):
+        self.initial_time = 30  # 30 seconds for initial countdown
+
+        def update_initial_timer():
+            if self.initial_time > 0:
+                # Insert message for initial countdown and auto-scroll
+                self.action_box.insert(tk.END, f"Prepare for battle! {self.initial_time} seconds remaining...\n")
+                self.action_box.see(tk.END)  # Auto-scroll to the bottom
+                self.initial_time -= 1
+                self.after(1000, update_initial_timer)  # Update every second
+                self.action_box.delete('1.0', tk.END)
+            else:
+                # Clear the action box and start the main game timer
+                self.action_box.delete('1.0', tk.END)
+                self.start_game_timer()
+
+        update_initial_timer()
+
+    
+    
     def start_game_timer(self):
         self.remaining_time = 600  # 10 minutes in seconds
+        self.action_box.insert(tk.END, "The battle begins now!\n")
 
         def update_timer():
             if self.remaining_time > 0:
@@ -383,13 +399,14 @@ class GameActionScreen(tk.Tk):
                 time_str = f"{minutes:02d}:{seconds:02d}"
                 self.timer_label.config(text=f"Time remaining: {time_str}")  # Update timer label
                 self.remaining_time -= 1
-                self.after(10, update_timer)
+                self.after(1000, update_timer)  # Update every second
             else:
-                broadcast_udp_message(game_end_code, brodcast_port)
-                broadcast_udp_message(game_end_code, brodcast_port)
-                broadcast_udp_message(game_end_code, brodcast_port)
                 self.action_box.insert(tk.END, "Time's up!\n")
                 stop_music()
+
+                # Broadcast the game end message
+                broadcast_udp_message(str(game_end_code), brodcast_port)
+
         update_timer()
 
 
@@ -406,6 +423,7 @@ class GameActionScreen(tk.Tk):
         self.green_score_var.set(new_score)
         self.green_score_entry.delete(0, tk.END)
         self.green_score_entry.insert(0, str(new_score))
+  
 
 
     def create_team_slots(self, frame, color, column, data):
