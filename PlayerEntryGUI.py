@@ -14,6 +14,11 @@ url = "https://gntzynfeplzsjtwuzwpb.supabase.co"
 key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdudHp5bmZlcGx6c2p0d3V6d3BiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDcyNzAyMDMsImV4cCI6MjAyMjg0NjIwM30.WBravl32P51EEqg-BykO2QyUoxgfINwCpvnVGXIbazM"
 supabase: Client = create_client(url, key)
 
+game_end_code = '221'
+
+
+brodcast_port = 7500
+recieve_port = 7501
 
 name_counter = 0
 red_player_entries = []
@@ -355,9 +360,13 @@ class GameActionScreen(tk.Tk):
                 time_str = f"{minutes:02d}:{seconds:02d}"
                 self.timer_label.config(text=f"Time remaining: {time_str}")  # Update timer label
                 self.remaining_time -= 1
-                self.after(1000, update_timer)
+                self.after(10, update_timer)
             else:
+                broadcast_udp_message(game_end_code, brodcast_port)
+                broadcast_udp_message(game_end_code, brodcast_port)
+                broadcast_udp_message(game_end_code, brodcast_port)
                 self.action_box.insert(tk.END, "Time's up!\n")
+
         update_timer()
 
 
