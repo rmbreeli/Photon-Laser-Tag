@@ -307,6 +307,9 @@ def play_music():
     pygame.mixer.music.load(mp3_file_path)
     pygame.mixer.music.play()
 
+
+def stop_music():
+    pygame.mixer.music.stop()
 class GameActionScreen(tk.Tk):
     def __init__(self, players_in_game_red, players_in_game_green):
         super().__init__()
@@ -451,6 +454,7 @@ def on_f5_press(event):
             # print("f5 pressed")
             game_screen.destroy()
             game_screen = None
+            stop_music()
         else:
             # Open a new game screen
             game_screen = GameActionScreen(players_in_game_red, players_in_game_green)
