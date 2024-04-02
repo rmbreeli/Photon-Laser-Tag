@@ -310,6 +310,8 @@ def play_music():
 
 def stop_music():
     pygame.mixer.music.stop()
+
+    
 class GameActionScreen(tk.Tk):
     def __init__(self, players_in_game_red, players_in_game_green):
         super().__init__()
