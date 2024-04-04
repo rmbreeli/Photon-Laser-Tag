@@ -17,6 +17,7 @@ supabase: Client = create_client(url, key)
 
 
 game_end_code = '221'
+game_start_code = '202'
 
 brodcast_port = 7500
 recieve_port = 7501
@@ -386,6 +387,7 @@ class GameActionScreen(tk.Tk):
     def start_game_timer(self):
         self.remaining_time = 600  # 10 minutes in seconds
         self.action_box.insert(tk.END, "The battle begins now!\n")
+        broadcast_udp_message(game_start_code, brodcast_port)
             
         def update_timer():
             if self.remaining_time > 0:
@@ -397,7 +399,8 @@ class GameActionScreen(tk.Tk):
             else:
                 self.action_box.insert(tk.END, "Time's up!\n")
                 # Broadcast the game end message
-                broadcast_udp_message(str(game_end_code), brodcast_port)
+                for i in range(3):
+                    broadcast_udp_message(str(game_end_code), brodcast_port)
 
         update_timer()
 
