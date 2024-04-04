@@ -21,6 +21,8 @@ game_end_code = '221'
 brodcast_port = 7500
 recieve_port = 7501
 
+start_bool = False #used to start the 10 min timer after the 30 sec timer
+
 name_counter = 0
 red_player_entries = []
 green_player_entries = []
@@ -353,8 +355,6 @@ class GameActionScreen(tk.Tk):
         self.timer_label = tk.Label(self, text="Time remaining:", fg="white", bg="black", font=("Helvetica", 14, "bold"))
         self.timer_label.grid(row=1, column=2, padx=10, pady=10, sticky="e")
 
-        # Start the game timer
-        self.start_game_timer()
 
         #Play the beatz
         play_music()
@@ -369,6 +369,7 @@ class GameActionScreen(tk.Tk):
 
         self.start_initial_countdown()
 
+
     def start_initial_countdown(self):
         self.initial_time = 30  # 30 seconds for initial countdown
 
@@ -379,20 +380,19 @@ class GameActionScreen(tk.Tk):
                 self.action_box.see(tk.END)  # Auto-scroll to the bottom
                 self.initial_time -= 1
                 self.after(1000, update_initial_timer)  # Update every second
-                self.action_box.delete('1.0', tk.END)
             else:
                 # Clear the action box and start the main game timer
+                start_bool = True
                 self.action_box.delete('1.0', tk.END)
+                # Start the game timer
                 self.start_game_timer()
 
         update_initial_timer()
 
-    
-    
     def start_game_timer(self):
         self.remaining_time = 600  # 10 minutes in seconds
         self.action_box.insert(tk.END, "The battle begins now!\n")
-
+            
         def update_timer():
             if self.remaining_time > 0:
                 minutes, seconds = divmod(self.remaining_time, 60)
