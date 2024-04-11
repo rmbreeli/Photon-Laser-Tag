@@ -22,7 +22,7 @@ game_start_code = '202'
 brodcast_port = 7500
 recieve_port = 7501
 
-start_bool = False #used to start the 10 min timer after the 30 sec timer
+start_bool = False #used to start the 6 min timer after the 30 sec timer
 
 name_counter = 0
 red_player_entries = []
@@ -338,7 +338,7 @@ class GameActionScreen(tk.Tk):
         self.green_title.grid(row=0, column=1, columnspan=2)
 
         # Create and configure action box
-        self.action_box = tk.Text(self, height=10, width=40, bg="lightgray", fg="black", font=("Helvetica", 15))
+        self.action_box = tk.Text(self, height=30, width=40, bg="lightgray", fg="black", font=("Helvetica", 15))
         self.action_box.grid(row=0, column=2, padx=10, pady=10)
 
         # Create and configure team score entry widgets
@@ -391,7 +391,7 @@ class GameActionScreen(tk.Tk):
         update_initial_timer()
 
     def start_game_timer(self):
-        self.remaining_time = 600  # 10 minutes in seconds
+        self.remaining_time = 360  # 6 minutes in seconds
         self.action_box.insert(tk.END, "The battle begins now!\n")
         broadcast_udp_message(game_start_code, brodcast_port)
             
