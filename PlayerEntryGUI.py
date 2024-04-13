@@ -193,6 +193,26 @@ def broadcast_udp_message(message, port):
         udp_socket.close()
 
 
+def receive_udp_message(port):
+    # Create a UDP socket
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    # Bind the socket to the port
+    udp_socket.bind(('127.0.0.1', port))
+
+    try:
+        print(f"Listening for UDP messages on port {port}...")
+        while True:
+            # Receive message
+            message, address = udp_socket.recvfrom(1024)
+            print(f"Received message '{message.decode()}' from {address}")
+
+            
+    finally:
+        # Close the socket
+        udp_socket.close()
+
+
 def add_player_entry():
     player_name = player_name_entry.get()
     #team_color = team_color_var.get()
