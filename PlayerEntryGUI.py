@@ -224,6 +224,11 @@ def add_player_entry():
         messagebox.showerror("Error", "Please enter player name, ID, and equipment ID.")
         return
     
+    # Check if player name contains only alphabetic characters
+    if not player_name.isalpha():
+        messagebox.showerror("Error", "Player name must only contain alphabetic characters.")
+        return
+    
     for player in players_in_game_red:
         name, id , equip_id= player
         if name == player_name or id == player_id or equipment_id == equip_id:
@@ -323,7 +328,7 @@ root.attributes('-topmost', True)
 
 def play_music():
     pygame.init()
-    mp3_file_path = "music/amazing (upload).mp3"
+    mp3_file_path = "amazing (upload).mp3"
     pygame.mixer.music.load(mp3_file_path)
     pygame.mixer.music.play()
 
@@ -343,94 +348,150 @@ class GameActionScreen(tk.Tk):
         self.configure(bg="black")
         self.attributes("-topmost", True)
 
-        # Create and configure frames for red and green teams
+        # Create and configure frames for red team, action, and green team
         self.red_frame = tk.Frame(self, bg="black")
-        self.red_frame.grid(row=0, column=0, padx=10, pady=10)
+        self.red_frame.grid(row=0, column=0, padx=10, pady=10, sticky="ns")
+
+        self.action_frame = tk.Frame(self, bg="black")
+        self.action_frame.grid(row=0, column=1, padx=10, pady=10, sticky="ns")
 
         self.green_frame = tk.Frame(self, bg="black")
-        self.green_frame.grid(row=0, column=1, padx=10, pady=10)
+        self.green_frame.grid(row=0, column=2, padx=10, pady=10, sticky="ns")
+
+        # Configure column weights for layout flexibility
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=1)
 
         # Create labels for team titles
         self.red_title = tk.Label(self.red_frame, text="Red Team", fg="red", bg="black", font=("Helvetica", 16, "bold"))
-        self.red_title.grid(row=0, column=0, columnspan=2)
+        self.red_title.grid(row=0, column=0, columnspan=2, pady=(0, 10))
 
         self.green_title = tk.Label(self.green_frame, text="Green Team", fg="green", bg="black", font=("Helvetica", 16, "bold"))
-        self.green_title.grid(row=0, column=1, columnspan=2)
+        self.green_title.grid(row=0, column=0, columnspan=2, pady=(0, 10))
 
-        # Create and configure action box
-        self.action_box = tk.Text(self, height=30, width=40, bg="lightgray", fg="black", font=("Helvetica", 15))
-        self.action_box.grid(row=0, column=2, padx=10, pady=10)
+        # Create the action box (text area) for the action frame
+        self.action_box = tk.Text(self.action_frame, height=30, width=40, bg="lightgray", fg="black", font=("Helvetica", 15))
+        self.action_box.grid(row=0, column=0, padx=10, pady=10)
 
-        # Create and configure team score entry widgets
+        # Create the timer label inside the action frame
+        self.timer_label = tk.Label(self.action_frame, text="Time remaining:", fg="white", bg="black", font=("Helvetica", 14, "bold"))
+        self.timer_label.grid(row=1, column=0, padx=10, pady=10)
+
+        # Create and configure team score entry widgets in red and green frames
         self.red_score_var = tk.StringVar()
         self.red_score_var.set("0")
-        self.red_score_entry = tk.Entry(self, textvariable=self.red_score_var, fg="red", bg="black", font=("Helvetica", 14, "bold"), width=5)
-        self.red_score_entry.grid(row=1, column=0, padx=10, pady=10)
+        self.red_score_entry = tk.Entry(self.red_frame, textvariable=self.red_score_var, fg="red", bg="black", font=("Helvetica", 14, "bold"), width=5)
+        self.red_score_entry.grid(row=1, column=0, pady=10)
 
         self.green_score_var = tk.StringVar()
         self.green_score_var.set("0")
-        self.green_score_entry = tk.Entry(self, textvariable=self.green_score_var, fg="green", bg="black", font=("Helvetica", 14, "bold"), width=5)
-        self.green_score_entry.grid(row=1, column=1, padx=10, pady=10)
+        self.green_score_entry = tk.Entry(self.green_frame, textvariable=self.green_score_var, fg="green", bg="black", font=("Helvetica", 14, "bold"), width=5)
+        self.green_score_entry.grid(row=1, column=0, pady=10)
 
-        # Create label for timer
-        self.timer_label = tk.Label(self, text="Time remaining:", fg="white", bg="black", font=("Helvetica", 14, "bold"))
-        self.timer_label.grid(row=1, column=2, padx=10, pady=10, sticky="e")
-
-
-        #Play the beatz
+        # Play the music when the game starts
         play_music()
 
-        #putting players into the action screen.
-        self.create_team_slots(self.red_frame, "red", column=0, data=players_in_game_red)
-        self.create_team_slots(self.green_frame, "green", column=1, data=players_in_game_green)
+        # Create team slots (player names and scores) for the red and green frames
+        self.create_team_slots(self.red_frame, "red", data=players_in_game_red)
+        self.create_team_slots(self.green_frame, "green", data=players_in_game_green)
 
-        # Bind keys to increase scores
+        # Bind key events to increase scores
         self.bind('<KeyPress-r>', self.increase_red_score)
         self.bind('<KeyPress-g>', self.increase_green_score)
 
+        # Start the initial countdown
         self.start_initial_countdown()
 
+    def create_team_slots(self, frame, color, data):
+        # Create and populate team slots in a specific frame (red or green)
+        tk.Label(frame, text="Name", fg=color, bg="black", font=("Helvetica", 12, "bold")).grid(row=1, column=0)
+        tk.Label(frame, text="Score", fg=color, bg="black", font=("Helvetica", 12, "bold")).grid(row=1, column=1)
+
+        count = 2
+        for entry in data:
+            name = entry[0]
+            # score = entry[1]
+            name_label = tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12))
+            name_label.grid(row=count, column=0, sticky="w")
+
+            # score_label = tk.Label(frame, text=score, fg=color, bg="black", font=("Helvetica", 12))
+            # score_label.grid(row=count, column=1, sticky="e")
+
+            count += 1
 
     def start_initial_countdown(self):
-        self.initial_time = 30  # 30 seconds for initial countdown
+        self.initial_time = 3  # Initial countdown duration in seconds
+
+        # Configure a tag for centering text
+        self.action_box.tag_configure("center", justify="center")
+        
+        # Insert the initial countdown message at the beginning of the action box
+        # Use the "center" tag to center the text
+        self.action_box.insert(tk.END, f"Prepare for battle! {self.initial_time} seconds remaining...\n", "center")
 
         def update_initial_timer():
             if self.initial_time > 0:
-                # Insert message for initial countdown and auto-scroll
-                self.action_box.insert(tk.END, f"Prepare for battle! {self.initial_time} seconds remaining...\n")
-                self.action_box.see(tk.END)  # Auto-scroll to the bottom
+                # Move the cursor to the start of the first line in the action box
+                self.action_box.delete("1.0", "1.0 lineend")  # Delete the existing line
+                
+                # Insert the updated countdown message at the start of the first line
+                # Use the "center" tag to center the text
+                self.action_box.insert("1.0", f"Prepare for battle! {self.initial_time} seconds remaining...", "center")
+                
+                # Decrease the initial time
                 self.initial_time -= 1
-                self.after(1000, update_initial_timer)  # Update every second
+                
+                # Schedule the next update after one second
+                self.after(1000, update_initial_timer)
             else:
-                # Clear the action box and start the main game timer
-                start_bool = True
-                self.action_box.delete('1.0', tk.END)
+                # Clear the initial countdown line when complete
+                self.action_box.delete("1.0", "1.0 lineend")
+                
                 # Start the game timer
                 self.start_game_timer()
 
+        # Start the initial countdown
         update_initial_timer()
+
+
 
     def start_game_timer(self):
         self.remaining_time = 360  # 6 minutes in seconds
-        self.action_box.insert(tk.END, "The battle begins now!\n")
-        broadcast_udp_message(game_start_code, brodcast_port)
-            
+
+        # Configure a tag for centering text
+        self.action_box.tag_configure("center", justify="center")
+
         def update_timer():
             if self.remaining_time > 0:
+                # Calculate minutes and seconds from the remaining time
                 minutes, seconds = divmod(self.remaining_time, 60)
-                time_str = f"{minutes:02d}:{seconds:02d}"
-                self.timer_label.config(text=f"Time remaining: {time_str}")  # Update timer label
+                
+                # Construct the updated time message
+                time_message = f"Time remaining: {minutes:02d}:{seconds:02d}"
+                
+                # Determine the position of the last line of text in the `action_box`
+                last_line_start = self.action_box.index("end-2l")  # Start of the last line
+                
+                # Update the existing time message at the bottom of the frame
+                self.action_box.delete(last_line_start, tk.END)  # Remove current message
+                
+                # Insert the updated message with the center tag
+                self.action_box.insert(last_line_start, f"{time_message}\n", "center")
+                
+                # Decrease the remaining time
                 self.remaining_time -= 1
-                self.after(1000, update_timer)  # Update every second
+                
+                # Schedule the next update in 1 second
+                self.after(1000, update_timer)
             else:
-                self.action_box.insert(tk.END, "Time's up!\n")
+                # Insert message when the time is up
+                self.action_box.insert(tk.END, "\nTime's up!\n", "center")
                 stop_music()
 
-                # Broadcast the game end message
-                for i in range(3):
-                    broadcast_udp_message(str(game_end_code), brodcast_port)
-
+        # Start the main game timer
         update_timer()
+
 
 
     def increase_red_score(self, event):
@@ -446,27 +507,6 @@ class GameActionScreen(tk.Tk):
         self.green_score_var.set(new_score)
         self.green_score_entry.delete(0, tk.END)
         self.green_score_entry.insert(0, str(new_score))
-  
-
-
-    def create_team_slots(self, frame, color, column, data):
-        # Create and populate team slots
-        tk.Label(frame, text="Name", fg=color, bg="black", font=("Helvetica", 12, "bold")).grid(row=1, column=column)
-        tk.Label(frame, text="Score", fg=color, bg="black", font=("Helvetica", 12, "bold")).grid(row=1, column=column + 1)
-
-        count = 2
-        for entry in data:
-            name = entry[0]
-            tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12)).grid(row=count, column=column)
-            tk.Entry(frame, textvariable=tk.StringVar(), fg=color, bg="black", font=("Helvetica", 10), width=10).grid(row=count, column=column + 1)
-            count += 1
-
-
-# def on_f5_press(event):
-#     if event.keysym == 'F5':
-#         print("f5 pressed")
-#         game_screen = GameActionScreen(players_in_game_red, players_in_game_green)
-#         game_screen.mainloop()
 
 game_screen = None
 
@@ -509,10 +549,6 @@ def clear_players(event):
         players_in_game_red.clear()
         players_in_game_green.clear()
 
-
-def create_new_window():
-    new_window = tk.Toplevel()
-    new_window.title("New Window")
     
 root.bind("<F5>", on_f5_press)
 root.bind("<F12>", clear_players)
