@@ -20,7 +20,7 @@ game_end_code = '221'
 game_start_code = '202'
 
 brodcast_port = 7500
-recieve_port = 7500
+recieve_port = 7501
 
 start_bool = False #used to start the 6 min timer after the 30 sec timer
 
