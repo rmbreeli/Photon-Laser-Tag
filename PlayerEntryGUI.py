@@ -421,9 +421,13 @@ class GameActionScreen(tk.Tk):
             udp_socket.close()
 
     def display_hit_message(self, hit_message):
-        """Schedules the hit message to be displayed in the action box."""
-        formatted_message = self.handle_hit_message(hit_message)
-        self.after(0, lambda: self.action_box.insert(tk.END, f"{formatted_message}\n"))
+        
+        formatted_message, equipment_id_hit = self.handle_hit_message(hit_message)
+        if equipment_id_hit:
+            
+            self.after(0, lambda: self.action_box.insert(tk.END, f"{formatted_message}\n"))
+            # Broadcast the equipment ID of the player who was hit
+            self.after(0, lambda: broadcast_udp_message(equipment_id_hit, brodcast_port))
 
     def handle_hit_message(self, hit_message):
         """Parses the hit message, looks up player names, and returns a formatted string."""
@@ -431,7 +435,8 @@ class GameActionScreen(tk.Tk):
             equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
             player_hit_by = player_names_by_equipment_id.get(equipment_id_hit_by, "Unknown Player")
             player_hit = player_names_by_equipment_id.get(equipment_id_hit, "Unknown Player")
-            return f"{player_hit_by} hit {player_hit}"
+            formatted_message = f"{player_hit_by} hit {player_hit}"
+            return formatted_message, equipment_id_hit
         except ValueError:
             return "Invalid message format."
 
