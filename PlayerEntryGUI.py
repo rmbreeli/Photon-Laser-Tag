@@ -323,7 +323,7 @@ root.attributes('-topmost', True)
 
 def play_music():
     pygame.init()
-    mp3_file_path = "music/amazing (upload).mp3"
+    mp3_file_path = "Track01.mp3"
     pygame.mixer.music.load(mp3_file_path)
     pygame.mixer.music.play()
 
@@ -400,7 +400,7 @@ class GameActionScreen(tk.Tk):
                 self.action_box.insert(tk.END, f"Prepare for battle! {self.initial_time} seconds remaining...\n")
                 self.action_box.see(tk.END)  # Auto-scroll to the bottom
                 self.initial_time -= 1
-                self.after(1000, update_initial_timer)  # Update every second
+                self.after(600, update_initial_timer)  # Update every second
             else:
                 # Clear the action box and start the main game timer
                 start_bool = True
