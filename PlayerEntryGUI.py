@@ -20,9 +20,9 @@ game_end_code = '221'
 game_start_code = '202'
 
 brodcast_port = 7500
-recieve_port = 7501
+recieve_port = 7500
 
-start_bool = False #used to start the 10 min timer after the 30 sec timer
+start_bool = False #used to start the 6 min timer after the 30 sec timer
 
 name_counter = 0
 red_player_entries = []
@@ -33,6 +33,7 @@ red_equipment_entries =[]
 green_equipment_entries =[]
 players_in_game_red = []
 players_in_game_green = []
+player_names_by_equipment_id = {}
 
 
 splash = Tk()
@@ -89,6 +90,10 @@ black_canvas.grid_columnconfigure(2, weight=2)
 black_canvas.grid_columnconfigure(3, weight=1)
 
 TeamTitleFont = ("Tekton pro", 15)
+
+def add_player(equipment_id, player_name):
+    #Adds a player to the dictionary, mapping their equipment ID to their name.
+    player_names_by_equipment_id[equipment_id] = player_name
 
 # Function to create a hollow square
 def create_hollow_square(canvas, size):
@@ -181,13 +186,33 @@ def broadcast_udp_message(message, port):
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
     # Set the broadcast address and port
-    broadcast_address = ('<broadcast>', port)
+    broadcast_address = ('127.0.0.1', port)
 
     try:
         # Send the UDP packet
         udp_socket.sendto(message.encode(), broadcast_address)
         print(f"Broadcasted message '{message}' to port {port}")
 
+    finally:
+        # Close the socket
+        udp_socket.close()
+
+
+def receive_udp_message(port):
+    # Create a UDP socket
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    # Bind the socket to the port
+    udp_socket.bind(('127.0.0.1', port))
+
+    try:
+        print(f"Listening for UDP messages on port {port}...")
+        while True:
+            # Receive message
+            message, address = udp_socket.recvfrom(1024)
+            print(f"Received message '{message.decode()}' from {address}")
+
+            
     finally:
         # Close the socket
         udp_socket.close()
@@ -227,6 +252,8 @@ def add_player_entry():
     if not_in_database == 1:
         data_to_insert = {"id": player_id, "Name": player_name}
         supabase.table("Users").insert(data_to_insert).execute()
+
+        add_player(equipment_id, player_name)
 
     #if equipment ID is even automatically puts player on the green team
     if int(equipment_id) % 2 == 0:
@@ -303,7 +330,7 @@ root.attributes('-topmost', True)
 
 def play_music():
     pygame.init()
-    mp3_file_path = "music/amazing (upload).mp3"
+    mp3_file_path = "music/Track01_edit.mp3"
     pygame.mixer.music.load(mp3_file_path)
     pygame.mixer.music.play()
 
@@ -332,7 +359,7 @@ class GameActionScreen(tk.Tk):
         self.green_title.grid(row=0, column=1, columnspan=2)
 
         # Create and configure action box
-        self.action_box = tk.Text(self, height=10, width=40, bg="lightgray", fg="black", font=("Helvetica", 15))
+        self.action_box = tk.Text(self, height=20, width=40, bg="lightgray", fg="black", font=("Helvetica", 15))
         self.action_box.grid(row=0, column=2, padx=10, pady=10)
 
         # Create and configure team score entry widgets
@@ -363,7 +390,19 @@ class GameActionScreen(tk.Tk):
         self.bind('<KeyPress-g>', self.increase_green_score)
 
         self.start_initial_countdown()
+        self.handle_hit_message("1:2")
 
+    def handle_hit_message(hit_message):
+            """
+            Parses the hit message, looks up player names, and returns a formatted string.
+            """
+            try:
+                equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
+                player_hit_by = player_names_by_equipment_id.get(equipment_id_hit_by, "Unknown Player")
+                player_hit = player_names_by_equipment_id.get(equipment_id_hit, "Unknown Player")
+                return f"{player_hit_by} hit {player_hit}"
+            except ValueError:
+                return "Invalid message format."
 
     def start_initial_countdown(self):
         self.initial_time = 30  # 30 seconds for initial countdown
@@ -385,7 +424,7 @@ class GameActionScreen(tk.Tk):
         update_initial_timer()
 
     def start_game_timer(self):
-        self.remaining_time = 600  # 10 minutes in seconds
+        self.remaining_time = 360  # 6 minutes in seconds
         self.action_box.insert(tk.END, "The battle begins now!\n")
         broadcast_udp_message(game_start_code, brodcast_port)
             
