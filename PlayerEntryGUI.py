@@ -7,6 +7,7 @@ import socket
 from supabase_py import create_client, Client
 import keyboard
 import pygame
+import threading
 
 # xZmV05zR7JaK9N8u DO NOT DELETE
 
@@ -253,18 +254,22 @@ def add_player_entry():
         data_to_insert = {"id": player_id, "Name": player_name}
         supabase.table("Users").insert(data_to_insert).execute()
 
-        add_player(equipment_id, player_name)
+        
 
     #if equipment ID is even automatically puts player on the green team
     if int(equipment_id) % 2 == 0:
         player_entries = green_player_entries
         color_frame = green_frame
         players_in_game_green.append([player_name, player_id, equipment_id])
+        add_player(equipment_id, player_name)
+        print("Current Player Names by Equipment ID:", player_names_by_equipment_id)
         print(players_in_game_green)
     else:
         player_entries = red_player_entries
         color_frame = red_frame
         players_in_game_red.append([player_name, player_id, equipment_id])
+        add_player(equipment_id, player_name)
+        print("Current Player Names by Equipment ID:", player_names_by_equipment_id)
         print(players_in_game_red)
 
     for i, entry in enumerate(player_entries, start=1):
@@ -334,6 +339,9 @@ def play_music():
     pygame.mixer.music.load(mp3_file_path)
     pygame.mixer.music.play()
 
+def stop_music():
+    pygame.mixer.music.stop()
+
 class GameActionScreen(tk.Tk):
     def __init__(self, players_in_game_red, players_in_game_green):
         super().__init__()
@@ -390,19 +398,44 @@ class GameActionScreen(tk.Tk):
         self.bind('<KeyPress-g>', self.increase_green_score)
 
         self.start_initial_countdown()
-        self.handle_hit_message("1:2")
+        self.listen_for_hits_thread = threading.Thread(target=self.listen_for_hits, daemon=True)
+        self.listen_for_hits_thread.start()
 
-    def handle_hit_message(hit_message):
-            """
-            Parses the hit message, looks up player names, and returns a formatted string.
-            """
-            try:
-                equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
-                player_hit_by = player_names_by_equipment_id.get(equipment_id_hit_by, "Unknown Player")
-                player_hit = player_names_by_equipment_id.get(equipment_id_hit, "Unknown Player")
-                return f"{player_hit_by} hit {player_hit}"
-            except ValueError:
-                return "Invalid message format."
+        print("Current Player Names by Equipment ID:", player_names_by_equipment_id)
+
+    
+
+    def listen_for_hits(self):
+        """Listens for UDP messages indicating hits and updates the action box."""
+        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        udp_socket.bind(('127.0.0.1', 7501))
+
+        try:
+            print(f"Listening for UDP messages on port {recieve_port}...")
+            while True:
+                message, address = udp_socket.recvfrom(1024)
+                hit_message = message.decode()
+                print(f"Received hit message: '{hit_message}'")
+                self.display_hit_message(hit_message)
+        finally:
+            udp_socket.close()
+
+    def display_hit_message(self, hit_message):
+        """Schedules the hit message to be displayed in the action box."""
+        formatted_message = self.handle_hit_message(hit_message)
+        self.after(0, lambda: self.action_box.insert(tk.END, f"{formatted_message}\n"))
+
+    def handle_hit_message(self, hit_message):
+        """Parses the hit message, looks up player names, and returns a formatted string."""
+        try:
+            equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
+            player_hit_by = player_names_by_equipment_id.get(equipment_id_hit_by, "Unknown Player")
+            player_hit = player_names_by_equipment_id.get(equipment_id_hit, "Unknown Player")
+            return f"{player_hit_by} hit {player_hit}"
+        except ValueError:
+            return "Invalid message format."
+
+    
 
     def start_initial_countdown(self):
         self.initial_time = 30  # 30 seconds for initial countdown
