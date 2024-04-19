@@ -423,6 +423,7 @@ class GameActionScreen(tk.Tk):
     def display_hit_message(self, hit_message):
         
         formatted_message, equipment_id_hit = self.handle_hit_message(hit_message)
+        self.update_scores(hit_message)
         if equipment_id_hit:
             
             self.after(0, lambda: self.action_box.insert(tk.END, f"{formatted_message}\n"))
@@ -439,6 +440,20 @@ class GameActionScreen(tk.Tk):
             return formatted_message, equipment_id_hit
         except ValueError:
             return "Invalid message format."
+        
+    def update_scores(self, hit_message):
+        try:
+            equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
+            
+            # Check if one equipment ID is even and the other is odd, indicating different teams
+            if (int(equipment_id_hit_by) % 2 == 0) != (int(equipment_id_hit) % 2 == 0):
+                # Different teams - Increase score
+                self.adjust_score(equipment_id_hit_by, 10)  # Increase shooter's score
+            else:
+                # Same team - Decrease score
+                self.adjust_score(equipment_id_hit_by, -10)  # Decrease shooter's score
+        except ValueError:
+            print("Invalid message format.")
 
     
 
