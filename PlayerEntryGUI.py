@@ -437,7 +437,7 @@ class GameActionScreen(tk.Tk):
     def display_hit_message(self, hit_message):
         
         formatted_message, equipment_id_hit = self.handle_hit_message(hit_message)
-        self.update_scores(hit_message)
+        # self.update_scores(hit_message)
         if equipment_id_hit:
             
             self.after(0, lambda: self.action_box.insert(tk.END, f"{formatted_message}\n"))
@@ -451,6 +451,7 @@ class GameActionScreen(tk.Tk):
             player_hit_by = player_names_by_equipment_id.get(equipment_id_hit_by, "Unknown Player")
             player_hit = player_names_by_equipment_id.get(equipment_id_hit, "Unknown Player")
             formatted_message = f"{player_hit_by} hit {player_hit}"
+            self.action_box.see(tk.END)  # Auto-scroll to the bottom
             return formatted_message, equipment_id_hit
         except ValueError:
             return "Invalid message format."
@@ -512,12 +513,15 @@ class GameActionScreen(tk.Tk):
         self.initial_time = 30  # 30 seconds for initial countdown
 
         def update_initial_timer():
+            self.action_box.delete('1.0', tk.END)
+
             if self.initial_time > 0:
                 # Insert message for initial countdown and auto-scroll
                 self.action_box.insert(tk.END, f"Prepare for battle! {self.initial_time} seconds remaining...\n")
                 self.action_box.see(tk.END)  # Auto-scroll to the bottom
                 self.initial_time -= 1
                 self.after(1000, update_initial_timer)  # Update every second
+                
             else:
                 # Clear the action box and start the main game timer
                 start_bool = True
@@ -531,6 +535,7 @@ class GameActionScreen(tk.Tk):
         self.remaining_time = 360  # 6 minutes in seconds
         self.action_box.insert(tk.END, "The battle begins now!\n")
         broadcast_udp_message(game_start_code, brodcast_port)
+        
             
         def update_timer():
             if self.remaining_time > 0:
