@@ -350,6 +350,10 @@ class GameActionScreen(tk.Tk):
     def __init__(self, players_in_game_red, players_in_game_green):
         super().__init__()
 
+        self.equipment_id_to_name = {}  # Initialize equipment ID to player name mapping
+        self.player_score_vars = {}  # Initialize player name to score variable mapping
+        self.player_score_entries = {}  # New dictionary to track Entry widgets by player name
+
         # Set up the main window
         self.title("Game Action Screen")
         self.geometry("800x600")
@@ -389,13 +393,19 @@ class GameActionScreen(tk.Tk):
         self.timer_label = tk.Label(self, text="Time remaining:", fg="white", bg="black", font=("Helvetica", 14, "bold"))
         self.timer_label.grid(row=1, column=2, padx=10, pady=10, sticky="e")
 
+        self.red_score_entry.insert(0, "0")
+        self.green_score_entry.insert(0, "0")
+
 
         #Play the beatz
         play_music()
 
+        print("Red Team Data:", players_in_game_red)
+        print("Green Team Data:", players_in_game_green)
+        
         #putting players into the action screen.
-        self.create_team_slots(self.red_frame, "red", column=0, data=players_in_game_red)
-        self.create_team_slots(self.green_frame, "green", column=1, data=players_in_game_green)
+        self.create_team_slots(self.red_frame, "red", players_in_game_red)
+        self.create_team_slots(self.green_frame, "green", players_in_game_green)
 
         # Bind keys to increase scores
         self.bind('<KeyPress-r>', self.increase_red_score)
@@ -459,7 +469,44 @@ class GameActionScreen(tk.Tk):
         except ValueError:
             print("Invalid message format.")
 
-    
+    def adjust_score(self, equipment_id, points):
+        # This method now only schedules the actual score adjustment to run on the main thread
+        self.after(0, lambda: self._adjust_score(equipment_id, points))
+
+    def _adjust_score(self, equipment_id, points):
+        player_name = self.equipment_id_to_name.get(equipment_id, "")
+        if player_name:
+            # Directly access the Entry widget for individual score
+            if player_name in self.player_score_entries:
+                score_entry = self.player_score_entries[player_name]
+                current_score = int(score_entry.get() or 0)  # Safely get current score, default to 0 if empty
+                new_score = max(0, current_score + points)   # Calculate new score
+                
+                # Update the Entry widget for individual score
+                score_entry.delete(0, tk.END)
+                score_entry.insert(0, str(new_score))
+                
+                # Determine the team and update team score
+                if int(equipment_id) % 2 == 0:  # Even equipment ID for green team
+                    current_team_score = int(self.green_score_var.get() or 0)
+                    new_team_score = current_team_score + points
+                    self.green_score_var.set(str(new_team_score))
+                    self.green_score_entry.delete(0, tk.END)
+                    self.green_score_entry.insert(0, str(new_team_score))
+                else:  # Odd equipment ID for red team
+                    current_team_score = int(self.red_score_var.get() or 0)
+                    new_team_score = current_team_score + points
+                    self.red_score_var.set(str(new_team_score))
+                    self.red_score_entry.delete(0, tk.END)
+                    self.red_score_entry.insert(0, str(new_team_score))
+                
+                print(f"Adjusted score for {player_name}: {new_score}")
+            else:
+                print(f"Entry widget for {player_name} not found.")
+        else:
+            print("Player not found.")
+
+
 
     def start_initial_countdown(self):
         self.initial_time = 30  # 30 seconds for initial countdown
@@ -519,17 +566,37 @@ class GameActionScreen(tk.Tk):
   
 
 
-    def create_team_slots(self, frame, color, column, data):
-        # Create and populate team slots
-        tk.Label(frame, text="Name", fg=color, bg="black", font=("Helvetica", 12, "bold")).grid(row=1, column=column)
-        tk.Label(frame, text="Score", fg=color, bg="black", font=("Helvetica", 12, "bold")).grid(row=1, column=column + 1)
+    def create_team_slots(self, frame, color, data):
+        local_equipment_id_to_name = {}
+        local_player_score_vars = {}
+        
+        row = 2
+        for name, player_id, equipment_id in data:
+            local_equipment_id_to_name[equipment_id] = name
+            score_var = tk.StringVar(value="0")
+            local_player_score_vars[name] = score_var
+            self.create_player_slot(frame, row, name, score_var, color)
+            row += 1
+        
+        # After creating slots for the team, update the global mappings
+        self.equipment_id_to_name.update(local_equipment_id_to_name)
+        self.player_score_vars.update(local_player_score_vars)
 
-        count = 2
-        for entry in data:
-            name = entry[0]
-            tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12)).grid(row=count, column=column)
-            tk.Entry(frame, textvariable=tk.StringVar(), fg=color, bg="black", font=("Helvetica", 10), width=10).grid(row=count, column=column + 1)
-            count += 1
+        print(f"Equipment ID to Name Mapping ({color} team):", local_equipment_id_to_name)
+        print(f"Player Score Variables ({color} team):", local_player_score_vars)
+
+
+    def create_player_slot(self, frame, row, name, score_var, color):
+        player_name_label = tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12))
+        player_name_label.grid(row=row, column=0, sticky="w")
+
+
+        # Instead of just creating an Entry and setting it aside, store it in the dictionary
+        score_entry = tk.Entry(frame, textvariable=score_var, fg=color, bg="black", font=("Helvetica", 10), width=10)
+        score_entry.grid(row=row, column=1, sticky="w")
+        self.player_score_entries[name] = score_entry
+
+        score_entry.insert(0,"0")
 
 
 # def on_f5_press(event):
