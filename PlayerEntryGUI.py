@@ -439,8 +439,16 @@ class GameActionScreen(tk.Tk):
         try:
             equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
             player_hit_by = player_names_by_equipment_id.get(equipment_id_hit_by, "Unknown Player")
-            player_hit = player_names_by_equipment_id.get(equipment_id_hit, "Unknown Player")
-            formatted_message = f"{player_hit_by} hit {player_hit}"
+            if equipment_id_hit == "53":
+                playerOrBase_hit = "Red Base" 
+                formatted_message = f"{player_hit_by} hit {playerOrBase_hit}"
+            elif equipment_id_hit == "43":
+                playerOrBase_hit = "Green Base"
+                formatted_message = f"{player_hit_by} hit {playerOrBase_hit}"
+            else: 
+                playerOrBase_hit = player_names_by_equipment_id.get(equipment_id_hit, "Unknown Player")
+                formatted_message = f"{player_hit_by} hit {playerOrBase_hit}"
+            
             self.action_box.see(tk.END)  # Auto-scroll to the bottom
             return formatted_message, equipment_id_hit
         except ValueError:
