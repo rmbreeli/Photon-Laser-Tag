@@ -437,7 +437,7 @@ class GameActionScreen(tk.Tk):
     def display_hit_message(self, hit_message):
         
         formatted_message, equipment_id_hit = self.handle_hit_message(hit_message)
-        # self.update_scores(hit_message)
+        self.update_scores(hit_message)
         if equipment_id_hit:
             
             self.after(0, lambda: self.action_box.insert(tk.END, f"{formatted_message}\n"))
