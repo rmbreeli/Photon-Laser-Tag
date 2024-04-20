@@ -36,6 +36,11 @@ players_in_game_red = []
 players_in_game_green = []
 player_names_by_equipment_id = {}
 
+# Make a consistent UI/UX theme
+# Define color constants
+DARK_BG = "#282828"  # A dark gray
+LIGHT_FG = "#E0E0E0"  # A light gray
+ACCENT_COLOR = "#FF5733"  # A bright accent color for important elements
 
 splash = Tk()
 splash.attributes('-fullscreen', True)  # Set fullscreen
@@ -62,11 +67,14 @@ root = tk.Tk()
 
 root.title("Laser Tag Player Entries")
 
+root.configure(bg=DARK_BG)  # Set the background color for the root window
+
 # Create a black canvas for the fullscreen window
-black_canvas = tk.Canvas(root, bg="black", highlightthickness=0)
+black_canvas = tk.Canvas(root, bg=DARK_BG, highlightthickness=0)
 black_canvas.grid(row=0, column=0, sticky="nsew")
 
-root.title_label = tk.Label(black_canvas, text="     PRESS F5 TO START              PRESS F12 TO CLEAR PLAYERS", fg="medium purple", borderwidth=2, relief=tk.SOLID, bg="black")
+# Title label
+root.title_label = tk.Label(black_canvas, text="     PRESS F5 TO START              PRESS F12 TO CLEAR PLAYERS", fg=ACCENT_COLOR, borderwidth=2, relief=tk.SOLID, bg=DARK_BG)
 titleFont = ("ariel", 20, "bold")
 root.title_label.grid(row=0, column=0, columnspan=5, sticky="n")
 root.title_label.configure(font=titleFont)
