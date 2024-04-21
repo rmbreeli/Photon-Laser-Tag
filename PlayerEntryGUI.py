@@ -8,6 +8,7 @@ from supabase_py import create_client, Client
 import keyboard
 import pygame
 import threading
+import random
 
 # xZmV05zR7JaK9N8u DO NOT DELETE
 
@@ -357,10 +358,19 @@ player_entry_frame.lift()
 root.attributes('-topmost', True)
 
 def play_music():
-    pygame.init()
-    mp3_file_path = "music/Track01_edit.mp3"
-    pygame.mixer.music.load(mp3_file_path)
-    pygame.mixer.music.play()
+    pygame.mixer.init()  # Initialize the mixer module
+    track_number = random.randint(1, 3)  # Generate a random number between 1 and 3
+    
+    
+    tracks = {
+        1: "music/Track01_edit.mp3",
+        2: "music/Track06.mp3",
+        3: "music/Track03.mp3"
+    }
+    
+    track_to_play = tracks[track_number]  
+    pygame.mixer.music.load(track_to_play)  
+    pygame.mixer.music.play()  
 
 def stop_music():
     pygame.mixer.music.stop()
@@ -373,6 +383,9 @@ class GameActionScreen(tk.Tk):
         self.player_score_vars = {}  
         self.player_score_entries = {}  
         self.player_name_labels = {}
+
+        self.current_base_holder_red = None  # Track the current base holder for the red team
+        self.current_base_holder_green = None  # Track the current base holder for the green team
 
         # Set up the main window
         self.title("Game Action Screen")
@@ -482,12 +495,13 @@ class GameActionScreen(tk.Tk):
         except ValueError:
             return "Invalid message format."
         
+        
     def update_scores(self, hit_message):
         try:
             equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
             
             # Assign points based on whether it's a base hit or player hit
-            if equipment_id_hit == "53" or equipment_id_hit == "43":  # Base hit detected
+            if equipment_id_hit == "53" or equipment_id_hit == "43":  
                 points = 100
             elif (int(equipment_id_hit_by) % 2 == 0) != (int(equipment_id_hit) % 2 == 0):
                 points = 10  # Different teams - Increase score
@@ -509,30 +523,42 @@ class GameActionScreen(tk.Tk):
             # Directly access the Entry widget for individual score
             if player_name in self.player_score_entries:
                 score_entry = self.player_score_entries[player_name]
-                current_score = int(score_entry.get() or 0)  # Safely get current score, default to 0 if empty
-                new_score = max(0, current_score + points)   # Calculate new score
+                current_score = int(score_entry.get() or 0)  
+                new_score = max(0, current_score + points)   
                 
                 # Update the Entry widget for individual score
                 score_entry.delete(0, tk.END)
                 score_entry.insert(0, str(new_score))
 
-            # Add a stylized "B" next to the player's name if a base is hit
-            # If the player hits a base, add a stylized "B" next to their name.
-            # This is indicated by awarding 100 points for a base hit.
-                if points == 100:
+            
+                if points == 100:  # This indicates a base hit
+                    is_red_team = int(equipment_id) % 2 != 0
+                    current_base_holder = self.current_base_holder_red if is_red_team else self.current_base_holder_green
+                    
+                    # Remove "B" from the previous base holder's name, if any
+                    if current_base_holder and current_base_holder in self.player_name_labels:
+                        previous_label = self.player_name_labels[current_base_holder]
+                        previous_label.config(text=current_base_holder)
+                        
+                    # Add "B" next to the current player's name
                     player_label = self.player_name_labels.get(player_name, None)
                     if player_label:
-                        player_label.config(text=f"B {player_name}")
+                        player_label.config(text=f"{chr(9399)} {player_name}")
+                        # Update the current base holder tracker
+                        if is_red_team:
+                            self.current_base_holder_red = player_name
+                        else:
+                            self.current_base_holder_green = player_name
 
                 
-                # Determine the team and update team score
-                if int(equipment_id) % 2 == 0:  # Even equipment ID for green team
+               
+                if int(equipment_id) % 2 == 0:  
                     current_team_score = int(self.green_score_var.get() or 0)
                     new_team_score = current_team_score + points
                     self.green_score_var.set(str(new_team_score))
                     self.green_score_entry.delete(0, tk.END)
                     self.green_score_entry.insert(0, str(new_team_score))
-                else:  # Odd equipment ID for red team
+                else:  
                     current_team_score = int(self.red_score_var.get() or 0)
                     new_team_score = current_team_score + points
                     self.red_score_var.set(str(new_team_score))
@@ -545,16 +571,14 @@ class GameActionScreen(tk.Tk):
         else:
             print("Player not found.")
 
-
-
     def start_initial_countdown(self):
-        self.initial_time = 30  # 30 seconds for initial countdown
+        self.initial_time = 30  
 
         def update_initial_timer():
             self.action_box.delete('1.0', tk.END)
 
             if self.initial_time > 0:
-                # Insert message for initial countdown and auto-scroll
+               
                 self.action_box.insert(tk.END, f"Prepare for battle! {self.initial_time} seconds remaining...\n")
                 self.action_box.see(tk.END)  # Auto-scroll to the bottom
                 self.initial_time -= 1
@@ -591,8 +615,8 @@ class GameActionScreen(tk.Tk):
                     broadcast_udp_message(str(game_end_code), brodcast_port)
 
         update_timer()
-  
-
+        
+    
 
     def create_team_slots(self, frame, color, data):
         local_equipment_id_to_name = {}

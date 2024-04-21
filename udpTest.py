@@ -8,7 +8,7 @@ def broadcast_message():
     broadcast_address = '127.0.0.1'  # Example for a common home network
     port = 7501
     
-    message = "1:2"
+    message = "221"
     
     try:
         sock.sendto(message.encode(), (broadcast_address, port))
