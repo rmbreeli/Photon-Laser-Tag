@@ -69,6 +69,10 @@ root.title("Laser Tag Player Entries")
 
 root.configure(bg=DARK_BG)  # Set the background color for the root window
 
+# Standard padding
+PADX = 10
+PADY = 10
+
 # Create a black canvas for the fullscreen window
 black_canvas = tk.Canvas(root, bg=DARK_BG, highlightthickness=0)
 black_canvas.grid(row=0, column=0, sticky="nsew")
@@ -76,7 +80,7 @@ black_canvas.grid(row=0, column=0, sticky="nsew")
 # Title label
 root.title_label = tk.Label(black_canvas, text="     PRESS F5 TO START              PRESS F12 TO CLEAR PLAYERS", fg=ACCENT_COLOR, borderwidth=2, relief=tk.SOLID, bg=DARK_BG)
 titleFont = ("ariel", 20, "bold")
-root.title_label.grid(row=0, column=0, columnspan=5, sticky="n")
+root.title_label.grid(row=0, column=0, columnspan=5, sticky="n", padx=PADX, pady=PADY)
 root.title_label.configure(font=titleFont)
 
 # Define the frames
@@ -88,8 +92,8 @@ lower_frame = tk.Frame(black_canvas, bg="black", width=100, height=50)
 
 # Grid layout for the frames
 blank_frame1.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
-red_frame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
-green_frame.grid(row=1, column=2, padx=10, pady=10, sticky="nsew")
+red_frame.grid(row=1, column=1, padx=PADX, pady=PADY, sticky="nsew")
+green_frame.grid(row=1, column=2, padx=PADX, pady=PADY, sticky="nsew")
 blank_frame2.grid(row=1, column=3, padx=10, pady=10, sticky="nsew")
 lower_frame.grid(row=2, column=0, columnspan=5, pady=10, sticky="nsew")
 
