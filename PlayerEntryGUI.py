@@ -369,9 +369,10 @@ class GameActionScreen(tk.Tk):
     def __init__(self, players_in_game_red, players_in_game_green):
         super().__init__()
 
-        self.equipment_id_to_name = {}  # Initialize equipment ID to player name mapping
-        self.player_score_vars = {}  # Initialize player name to score variable mapping
-        self.player_score_entries = {}  # New dictionary to track Entry widgets by player name
+        self.equipment_id_to_name = {} 
+        self.player_score_vars = {}  
+        self.player_score_entries = {}  
+        self.player_name_labels = {}
 
         # Set up the main window
         self.title("Game Action Screen")
@@ -487,13 +488,16 @@ class GameActionScreen(tk.Tk):
         try:
             equipment_id_hit_by, equipment_id_hit = hit_message.split(":")
             
-            # Check if one equipment ID is even and the other is odd, indicating different teams
-            if (int(equipment_id_hit_by) % 2 == 0) != (int(equipment_id_hit) % 2 == 0):
-                # Different teams - Increase score
-                self.adjust_score(equipment_id_hit_by, 10)  # Increase shooter's score
+            # Assign points based on whether it's a base hit or player hit
+            if equipment_id_hit == "53" or equipment_id_hit == "43":  # Base hit detected
+                points = 100
+            elif (int(equipment_id_hit_by) % 2 == 0) != (int(equipment_id_hit) % 2 == 0):
+                points = 10  # Different teams - Increase score
             else:
-                # Same team - Decrease score
-                self.adjust_score(equipment_id_hit_by, -10)  # Decrease shooter's score
+                points = -10  # Same team - Decrease score
+
+            self.after(0, lambda: self._adjust_score(equipment_id_hit_by, points))
+            
         except ValueError:
             print("Invalid message format.")
 
@@ -501,7 +505,7 @@ class GameActionScreen(tk.Tk):
         # This method now only schedules the actual score adjustment to run on the main thread
         self.after(0, lambda: self._adjust_score(equipment_id, points))
 
-    def _adjust_score(self, equipment_id, points):
+    def _adjust_score(self, equipment_id, points, hit_base=False):
         player_name = self.equipment_id_to_name.get(equipment_id, "")
         if player_name:
             # Directly access the Entry widget for individual score
@@ -513,6 +517,15 @@ class GameActionScreen(tk.Tk):
                 # Update the Entry widget for individual score
                 score_entry.delete(0, tk.END)
                 score_entry.insert(0, str(new_score))
+
+            # Add a stylized "B" next to the player's name if a base is hit
+            # If the player hits a base, add a stylized "B" next to their name.
+            # This is indicated by awarding 100 points for a base hit.
+                if points == 100:
+                    player_label = self.player_name_labels.get(player_name, None)
+                    if player_label:
+                        player_label.config(text=f"B {player_name}")
+
                 
                 # Determine the team and update team score
                 if int(equipment_id) % 2 == 0:  # Even equipment ID for green team
@@ -621,6 +634,7 @@ class GameActionScreen(tk.Tk):
     def create_player_slot(self, frame, row, name, score_var, color):
         player_name_label = tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12))
         player_name_label.grid(row=row, column=0, sticky="w")
+        self.player_name_labels[name] = player_name_label  # Store reference to update later if needed
 
 
         # Instead of just creating an Entry and setting it aside, store it in the dictionary
