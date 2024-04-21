@@ -427,13 +427,11 @@ class GameActionScreen(tk.Tk):
         self.create_team_slots(self.red_frame, "red", players_in_game_red)
         self.create_team_slots(self.green_frame, "green", players_in_game_green)
 
-        # Bind keys to increase scores
-        self.bind('<KeyPress-r>', self.increase_red_score)
-        self.bind('<KeyPress-g>', self.increase_green_score)
-
         self.start_initial_countdown()
         self.listen_for_hits_thread = threading.Thread(target=self.listen_for_hits, daemon=True)
         self.listen_for_hits_thread.start()
+        
+        self.after(1000, self.check_high_score)
 
         print("Current Player Names by Equipment ID:", player_names_by_equipment_id)
 
@@ -593,21 +591,6 @@ class GameActionScreen(tk.Tk):
                     broadcast_udp_message(str(game_end_code), brodcast_port)
 
         update_timer()
-
-
-    def increase_red_score(self, event):
-        current_score = int(self.red_score_var.get())
-        new_score = current_score + 100
-        self.red_score_var.set(new_score)
-        self.red_score_entry.delete(0, tk.END)
-        self.red_score_entry.insert(0, str(new_score))
-
-    def increase_green_score(self, event):
-        current_score = int(self.green_score_var.get())
-        new_score = current_score + 100
-        self.green_score_var.set(new_score)
-        self.green_score_entry.delete(0, tk.END)
-        self.green_score_entry.insert(0, str(new_score))
   
 
 
@@ -644,12 +627,70 @@ class GameActionScreen(tk.Tk):
 
         score_entry.insert(0,"0")
 
+    
 
-# def on_f5_press(event):
-#     if event.keysym == 'F5':
-#         print("f5 pressed")
-#         game_screen = GameActionScreen(players_in_game_red, players_in_game_green)
-#         game_screen.mainloop()
+    def check_high_score(self):
+        highest_score = 0
+        highest_player_name = ""
+        color_flag = 0
+
+        # Check scores for players in the red team
+        for name, player_id, equipment_id in players_in_game_red:
+            player_name = self.equipment_id_to_name.get(equipment_id, "")
+            if player_name:
+            # Directly access the Entry widget for individual score
+                if player_name in self.player_score_entries:
+                    score_entry = self.player_score_entries[player_name]
+                    current_score = int(score_entry.get() or 0)
+                    # print("CURRENT SCORE: ", current_score)
+            if current_score is not None:
+                if current_score > highest_score:
+                    highest_score = current_score
+                    highest_player_name = name
+            else:
+                print("No score_var found for player:", name)
+
+        # # Check scores for players in the green team
+        for name, player_id, equipment_id in players_in_game_green:
+            player_name = self.equipment_id_to_name.get(equipment_id, "")
+            if player_name:
+            # Directly access the Entry widget for individual score
+                if player_name in self.player_score_entries:
+                    score_entry = self.player_score_entries[player_name]
+                    current_score = int(score_entry.get() or 0)
+                    # print("CURRENT SCORE: ", current_score)
+            if current_score is not None:
+                if current_score > highest_score:
+                    color_flag = 1
+                    highest_score = current_score
+                    highest_player_name = name
+            else:
+                print("No score_var found for player:", name)
+
+        # print("Highest score: " + highest_player_name)
+        # Once you have the highest score and player name, you can handle flashing
+        self.flash_player_name(highest_player_name, color_flag)
+
+        # Call this method again after 1000 milliseconds (1 second)
+        self.after(1000, self.check_high_score)
+
+    def flash_player_name(self, player_name, color_flag):
+        # print("MADE IT HERE")
+        label = self.player_name_labels.get(player_name)
+        if label:
+            # print("MADE IT HERE TOO")
+            # Flash the label by changing its background color
+            for _ in range(5):  # Flash 5 times
+                label.config(bg="black", fg="yellow")  # Change to yellow
+                self.update()  # Update the GUI to reflect changes
+                time.sleep(0.2)  # Wait 0.2 seconds
+                if(color_flag == 0):
+                    label.config(bg="black", fg="red")  # Change back to white
+
+                if(color_flag == 1):
+                    label.config(bg="black", fg="green")
+                self.update()  # Update again
+                time.sleep(0.2)  # Wait again
 
 game_screen = None
 
