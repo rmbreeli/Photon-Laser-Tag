@@ -42,6 +42,11 @@ DARK_BG = "#282828"  # A dark gray
 LIGHT_FG = "#E0E0E0"  # A light gray
 ACCENT_COLOR = "#FF5733"  # A bright accent color for important elements
 
+# Modern font choices
+LARGE_FONT = ("Arial", 18, "bold")
+MEDIUM_FONT = ("Roboto", 14)
+SMALL_FONT = ("Helvetica", 12)
+
 splash = Tk()
 splash.attributes('-fullscreen', True)  # Set fullscreen
 splash.title("Splash image")
@@ -63,6 +68,8 @@ lab.pack()
 splash.mainloop()
 
 time.sleep(1)
+
+# GUI setup
 root = tk.Tk()
 
 root.title("Laser Tag Player Entries")
@@ -330,12 +337,12 @@ root.geometry(f"{window_width}x{window_height}+1025+0")
 player_entry_frame = tk.LabelFrame(root, text="Player Entry", bg="black", fg="white")
 player_entry_frame.grid(row=1, column=4, padx=10, pady=10, sticky="nsew")
 
-tk.Label(player_entry_frame, text="Player ID:", fg="white", bg="black").grid(row=0, column=0, padx=5, pady=5)
-player_id_entry = tk.Entry(player_entry_frame, bg="light gray", fg="black", width=18)
+tk.Label(player_entry_frame, text="Player ID:", font=MEDIUM_FONT, fg="white", bg="black").grid(row=0, column=0, padx=5, pady=5)
+player_id_entry = tk.Entry(player_entry_frame, font=MEDIUM_FONT, bg="light gray", fg="black", width=18)
 player_id_entry.grid(row=0, column=1, padx=5, pady=5)
 
-tk.Label(player_entry_frame, text="Player Name:", fg="white", bg="black").grid(row=1, column=0, padx=5, pady=5)
-player_name_entry = tk.Entry(player_entry_frame, bg="light gray", fg="black", width=18)
+tk.Label(player_entry_frame, text="Player Name:", font=MEDIUM_FONT, fg="white", bg="black").grid(row=1, column=0, padx=5, pady=5)
+player_name_entry = tk.Entry(player_entry_frame, font=MEDIUM_FONT, bg="light gray", fg="black", width=18)
 player_name_entry.grid(row=1, column=1, padx=5, pady=5)
 
 # Inside the GUI layout section
@@ -343,7 +350,7 @@ tk.Label(player_entry_frame, text="Equipment ID:", fg="white", bg="black").grid(
 equipment_id_entry = tk.Entry(player_entry_frame, bg="light gray",fg = "black", width=18)
 equipment_id_entry.grid(row=2, column=1, padx=5, pady=5)
 
-add_player_button = tk.Button(player_entry_frame, text="Add Player", command=add_player_entry)
+add_player_button = tk.Button(player_entry_frame, text="Add Player", font=SMALL_FONT, command=add_player_entry)
 add_player_button.grid(row=5, column=0, columnspan=2, pady=5)
 
 player_entry_frame.lift()
