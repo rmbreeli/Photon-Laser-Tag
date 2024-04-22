@@ -389,7 +389,7 @@ class GameActionScreen(tk.Tk):
 
         # Set up the main window
         self.title("Game Action Screen")
-        self.geometry("800x600")
+        self.geometry("900x700")
         self.configure(bg="black")
         self.attributes("-topmost", True)
 
@@ -570,6 +570,7 @@ class GameActionScreen(tk.Tk):
                 print(f"Entry widget for {player_name} not found.")
         else:
             print("Player not found.")
+        self.sort_and_update_display()  
 
     def start_initial_countdown(self):
         self.initial_time = 30  
@@ -639,21 +640,49 @@ class GameActionScreen(tk.Tk):
 
 
     def create_player_slot(self, frame, row, name, score_var, color):
-        player_name_label = tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12))
-        player_name_label.grid(row=row, column=0, sticky="w")
-        self.player_name_labels[name] = player_name_label  # Store reference to update later if needed
+        column_offset = 0
+        if color == "green":
+            column_offset = 1  # Shift to the right by using an additional column offset
 
+        player_name_label = tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12))
+        player_name_label.grid(row=row, column=0 + column_offset, sticky="w", padx=(20,0))  # Add padx for extra spacing if needed
 
         # Instead of just creating an Entry and setting it aside, store it in the dictionary
         score_entry = tk.Entry(frame, textvariable=score_var, fg=color, bg="black", font=("Helvetica", 10), width=10)
-        score_entry.grid(row=row, column=1, sticky="w")
+        score_entry.grid(row=row, column=1 + column_offset, sticky="w", padx=(20,0))  # Add padx for extra spacing if needed
+
+        self.player_name_labels[name] = player_name_label  # Store reference to update later if needed
         self.player_score_entries[name] = score_entry
 
         score_entry.insert(0,"0")
 
+    def sort_and_update_display(self):
+        # Sort players by scores in descending order
+        self.sort_players()
+
+        # Update the grid positions of the widgets based on the new order
+        self.update_player_positions()
     
+    def sort_players(self):
+        # Sort player entries in descending order by score
+        self.sorted_red_players = sorted(players_in_game_red, key=lambda x: int(self.player_score_entries[self.equipment_id_to_name[x[2]]].get()), reverse=True)
+        self.sorted_green_players = sorted(players_in_game_green, key=lambda x: int(self.player_score_entries[self.equipment_id_to_name[x[2]]].get()), reverse=True)
+
+    def update_player_positions(self):
+        # Red team
+        for i, (_, _, equipment_id) in enumerate(self.sorted_red_players):
+            name = self.equipment_id_to_name[equipment_id]
+            self.player_name_labels[name].grid(row=i+2, column=0, sticky="w")
+            self.player_score_entries[name].grid(row=i+2, column=1, sticky="w")
+
+        # Green team
+        for i, (_, _, equipment_id) in enumerate(self.sorted_green_players):
+            name = self.equipment_id_to_name[equipment_id]
+            self.player_name_labels[name].grid(row=i+2, column=0, sticky="w")
+            self.player_score_entries[name].grid(row=i+2, column=1, sticky="w")
 
     def check_high_score(self):
+        self.update()
         highest_score = 0
         highest_player_name = ""
         color_flag = 0
