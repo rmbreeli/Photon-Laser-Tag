@@ -23,10 +23,10 @@ class GameScreen(tk.Tk):
         self.green_frame.grid(row=0, column=1, padx=10, pady=10)
 
         # Create labels for team titles
-        self.red_title = tk.Label(self.red_frame, text="Red Team", fg="red", bg="black", font=(G_FONT))
+        self.red_title = tk.Label(self.red_frame, text="Red Team", fg="red", bg="black", font=G_FONT)
         self.red_title.grid(row=0, column=0, columnspan=2)
 
-        self.green_title = tk.Label(self.green_frame, text="Green Team", fg="green", bg="black", font=(G_FONT))
+        self.green_title = tk.Label(self.green_frame, text="Green Team", fg="green", bg="black", font=G_FONT)
         self.green_title.grid(row=0, column=1, columnspan=2)
 
         # Create and populate red team slots
