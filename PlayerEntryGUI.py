@@ -331,7 +331,7 @@ screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 
-root.geometry(f"{window_width}x{window_height}+1025+0")
+root.geometry(f"{'375'}x{'200'}+1025+0")
 
 
 # Add player entry section
@@ -642,7 +642,7 @@ class GameActionScreen(tk.Tk):
     def create_player_slot(self, frame, row, name, score_var, color):
         column_offset = 0
         if color == "green":
-            column_offset = 1  # Shift to the right by using an additional column offset
+            column_offset = 1 
 
         player_name_label = tk.Label(frame, text=name, fg=color, bg="black", font=("Helvetica", 12))
         player_name_label.grid(row=row, column=0 + column_offset, sticky="w", padx=(20,0))  # Add padx for extra spacing if needed
